@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人生生存試算器 60年長期財務模型 (含25/28歲買房選項)</title>
+  <title>人生生存試算器 60年長期財務模型 (含雜支開銷版)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -302,7 +302,7 @@
 <div class="container">
   <header>
     <h1>人生生存試算器 (60年長期財務模型)</h1>
-    <p>自選起算與退休年齡、另一半結婚獎金推估、產假育嬰留停薪資折減、投資雙軌對照</p>
+    <p>自選起算與退休年齡、另一半結婚獎金推估、產假育嬰留停薪資折減、日常雜支精算</p>
   </header>
 
   <div class="grid">
@@ -525,7 +525,7 @@
         </div>
       </div>
 
-      <!-- 居住規劃專區 (新增 25、28 歲買房選項) -->
+      <!-- 居住規劃專區 -->
       <div class="section-subtitle">🏠 居住模式與購屋規劃</div>
       <div class="housing-box">
         <div class="form-group">
@@ -608,27 +608,27 @@
         <input type="number" id="baseRent" value="5000" step="500" oninput="calculate()">
       </div>
 
-      <!-- 細項日常生活開銷 -->
+      <!-- 細項日常生活開銷 (含雜支開銷) -->
       <div class="section-subtitle">🛒 每月細項基礎生活開銷 (年通膨3%)</div>
       <div class="input-row">
         <div class="form-group">
           <label>伙食費 (NT$)</label>
-          <input type="number" id="expFood" value="18000" step="500" oninput="calculate()">
+          <input type="number" id="expFood" value="25000" step="500" oninput="calculate()">
         </div>
         <div class="form-group">
           <label>休閒娛樂 (NT$)</label>
-          <input type="number" id="expFun" value="5000" step="500" oninput="calculate()">
+          <input type="number" id="expFun" value="10000" step="500" oninput="calculate()">
         </div>
       </div>
 
       <div class="input-row">
         <div class="form-group">
           <label>保健與醫療支出 (NT$)</label>
-          <input type="number" id="expHealth" value="4000" step="500" oninput="calculate()">
+          <input type="number" id="expHealth" value="6000" step="500" oninput="calculate()">
         </div>
         <div class="form-group">
           <label>通訊手機費 (NT$)</label>
-          <input type="number" id="expPhone" value="1200" step="100" oninput="calculate()">
+          <input type="number" id="expPhone" value="1800" step="100" oninput="calculate()">
         </div>
       </div>
 
@@ -639,17 +639,23 @@
         </div>
         <div class="form-group">
           <label>電費 (月均)</label>
-          <input type="number" id="expPower" value="1500" step="100" oninput="calculate()">
+          <input type="number" id="expPower" value="1800" step="100" oninput="calculate()">
         </div>
         <div class="form-group">
           <label>家用網路費</label>
-          <input type="number" id="expNet" value="700" step="50" oninput="calculate()">
+          <input type="number" id="expNet" value="1000" step="50" oninput="calculate()">
         </div>
       </div>
 
-      <div class="form-group">
-        <label>個人/家庭定期商業保險 (月均 NT$)</label>
-        <input type="number" id="expInsurance" value="8000" step="500" oninput="calculate()">
+      <div class="input-row">
+        <div class="form-group">
+          <label>個人/家庭定期商業保險 (月均 NT$)</label>
+          <input type="number" id="expInsurance" value="8000" step="500" oninput="calculate()">
+        </div>
+        <div class="form-group">
+          <label>日常生活雜支 (月均 NT$)</label>
+          <input type="number" id="expMisc" value="3000" step="500" oninput="calculate()">
+        </div>
       </div>
 
       <!-- 五階段育兒支出模型 -->
@@ -990,12 +996,15 @@
     const startAge = parseInt(document.getElementById('startAge').value, 10);
     const retireAge = parseInt(document.getElementById('retireAge').value, 10);
 
+    // 25 歲階
     document.getElementById('box_stage_25').style.display = (startAge === 25) ? 'block' : 'none';
     document.getElementById('box_inv_25').style.display = (startAge === 25) ? 'block' : 'none';
 
+    // 30~34 歲階
     document.getElementById('box_stage_30').style.display = (startAge <= 30) ? 'block' : 'none';
     document.getElementById('box_inv_30').style.display = (startAge <= 30) ? 'block' : 'none';
 
+    // 延退階
     document.getElementById('box_stage_65').style.display = (retireAge > 65) ? 'block' : 'none';
     document.getElementById('box_inv_65').style.display = (retireAge > 65) ? 'block' : 'none';
 
@@ -1222,8 +1231,9 @@
     const expPower = parseFloat(document.getElementById('expPower').value) || 0;
     const expNet = parseFloat(document.getElementById('expNet').value) || 0;
     const expInsurance = parseFloat(document.getElementById('expInsurance').value) || 0;
+    const expMisc = parseFloat(document.getElementById('expMisc').value) || 0; // 新增雜支項
 
-    const baseGeneralLiving = expFood + expFun + expHealth + expPhone + expWater + expPower + expNet + expInsurance;
+    const baseGeneralLiving = expFood + expFun + expHealth + expPhone + expWater + expPower + expNet + expInsurance + expMisc;
     const childBornAge = parseInt(document.getElementById('childBornAge').value, 10);
     const maternityPayRatio = parseFloat(document.getElementById('maternityPayType').value) || 1;
 
@@ -1514,7 +1524,7 @@
       <tr class="sub-row"><td> ├ 每月股票配息收入</td>${ageList.map(a => `<td style="color:${milestoneData[a].dividend > 0 ? 'var(--primary-dark)' : 'inherit'}; font-weight:${milestoneData[a].dividend > 0 ? '700' : 'normal'}">${formatMoney(milestoneData[a].dividend)}</td>`).join('')}</tr>
       <tr class="sub-row"><td> └ 每月退休勞保勞退年金</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].pension)}</td>`).join('')}</tr>
       <tr><td>每月居住成本 (${isBuyStrategy ? '房貸/稅/租' : '房租'})</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].housing)}</td>`).join('')}</tr>
-      <tr><td>每月基礎開銷 (含管理費)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].living - milestoneData[a].child)}</td>`).join('')}</tr>
+      <tr><td>每月基礎開銷 (含管理費與雜支)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].living - milestoneData[a].child)}</td>`).join('')}</tr>
       <tr class="sub-row"><td> └ 其中：大樓管理費</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].maint)}</td>`).join('')}</tr>
       <tr><td>每月小孩教育育兒開銷</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].child)}</td>`).join('')}</tr>
       <tr><td>每月投資提撥 (分階段)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].invest)}</td>`).join('')}</tr>
