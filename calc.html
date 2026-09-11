@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人生生存試算器 60年長期財務模型 (買房後計管理費版)</title>
+  <title>人生生存試算器 60年長期財務模型 (雙薪與結婚節點版)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -166,6 +166,14 @@
       margin-bottom: 12px;
     }
 
+    .spouse-box {
+      background: #fdf4ff;
+      border: 1.5px dashed var(--purple);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
     .stage-label {
       font-size: 0.78rem;
       font-weight: 700;
@@ -294,7 +302,7 @@
 <div class="container">
   <header>
     <h1>人生生存試算器 (60年長期財務模型)</h1>
-    <p>居住模式優先切換、購屋規費與裝潢連動、自備款不足警示、管理費買房後起算</p>
+    <p>自選起算與退休年齡、獨立另一半薪資與結婚年齡節點、購屋置產與投資對照</p>
   </header>
 
   <div class="grid">
@@ -327,17 +335,40 @@
       <div class="form-group">
         <label>薪水模式</label>
         <select id="salaryMode" onchange="handleSalaryModeChange()">
-          <option value="single" selected>單薪模式</option>
-          <option value="double">雙薪模式</option>
+          <option value="single">單薪模式</option>
+          <option value="double" selected>雙薪模式 (可分開填寫與選結婚年齡)</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>起算年齡月薪總額 (NT$)</label>
-        <input type="number" id="baseSalary" value="38000" step="1000" oninput="calculate()">
+        <label>我的起始月薪 (NT$)</label>
+        <input type="number" id="baseSalarySelf" value="38000" step="1000" oninput="calculate()">
       </div>
 
-      <div class="section-subtitle">🎁 各階段獎金規劃 (本薪年漲2%複利)</div>
+      <!-- 雙薪專用區塊 -->
+      <div id="spouseSalaryBox" class="spouse-box">
+        <div class="input-row">
+          <div class="form-group">
+            <label>另一半起始月薪 (NT$)</label>
+            <input type="number" id="baseSalarySpouse" value="45000" step="1000" oninput="calculate()">
+          </div>
+          <div class="form-group">
+            <label>預計幾歲結婚合併雙薪？</label>
+            <select id="marryAge" onchange="calculate()">
+              <option value="30">30 歲結婚 (起算即雙薪)</option>
+              <option value="32">32 歲結婚</option>
+              <option value="35" selected>35 歲結婚</option>
+              <option value="38">38 歲結婚</option>
+              <option value="40">40 歲結婚</option>
+            </select>
+          </div>
+        </div>
+        <div style="font-size:0.78rem; color:#86198f; margin-top:4px;">
+          * 結婚前僅計入自己的單薪；結婚當年起，另一半薪水（含每年 2% 調薪）正式併入家庭收入。
+        </div>
+      </div>
+
+      <div class="section-subtitle">🎁 各階段個人獎金 (本薪年漲2%複利)</div>
       
       <!-- 25~29 歲獎金 -->
       <div class="stage-box" id="box_stage_25" style="display:none;">
@@ -467,7 +498,7 @@
         </div>
       </div>
 
-      <!-- 居住規劃專區：先選租或買 -->
+      <!-- 居住規劃專區 -->
       <div class="section-subtitle">🏠 居住模式與購屋規劃</div>
       <div class="housing-box">
         <div class="form-group">
@@ -478,7 +509,6 @@
           </select>
         </div>
 
-        <!-- 買房專用設定欄位 -->
         <div id="buyDetailsContainer">
           <div class="input-row">
             <div class="form-group">
@@ -533,7 +563,6 @@
             </div>
           </div>
 
-          <!-- 管理費移入買房專屬區 -->
           <div class="form-group" style="margin-top: 6px;">
             <label>購屋後每月大樓管理費 (買房後才開始計收 NT$)</label>
             <input type="number" id="buyMaint" value="2500" step="200" oninput="calculate()">
@@ -545,7 +574,6 @@
         </div>
       </div>
 
-      <!-- 租金欄位 (買房前租金 或 全程租金) -->
       <div class="form-group" id="rentRow">
         <label id="lbl_baseRent">未買房前每月租金 (買房後自動歸零 NT$)</label>
         <input type="number" id="baseRent" value="5000" step="500" oninput="calculate()">
@@ -612,7 +640,6 @@
         </div>
 
         <div id="childStagesContainer" style="display:none;">
-          <!-- 0-3 歲 -->
           <div class="stage-box">
             <div class="stage-label">🍼 階段一：0～3 歲嬰幼兒期 (每月支出)</div>
             <div class="input-row-4">
@@ -635,7 +662,6 @@
             </div>
           </div>
 
-          <!-- 3-6 歲 -->
           <div class="stage-box">
             <div class="stage-label">🎨 階段二：3～6 歲幼兒園期 (每月支出)</div>
             <div class="input-row-3">
@@ -654,7 +680,6 @@
             </div>
           </div>
 
-          <!-- 6-12 歲 -->
           <div class="stage-box">
             <div class="stage-label">🎒 階段三：6～12 歲國小期 (每月支出)</div>
             <div class="input-row-4">
@@ -677,7 +702,6 @@
             </div>
           </div>
 
-          <!-- 12-18 歲 -->
           <div class="stage-box">
             <div class="stage-label">📚 階段四：12～18 歲國高中期 (每月支出)</div>
             <div class="input-row-3">
@@ -696,7 +720,6 @@
             </div>
           </div>
 
-          <!-- 18-22 歲 -->
           <div class="stage-box">
             <div class="stage-label">🎓 階段五：18～22 歲大學期 (每月支出)</div>
             <div class="input-row-3">
@@ -919,13 +942,8 @@
   }
 
   function handleSalaryModeChange() {
-    const isDouble = document.getElementById('salaryMode').value === 'double';
-    const salaryInput = document.getElementById('baseSalary');
-    if (isDouble && parseFloat(salaryInput.value) <= 60000) {
-      salaryInput.value = 135000;
-    } else if (!isDouble && parseFloat(salaryInput.value) > 100000) {
-      salaryInput.value = 38000;
-    }
+    const isDouble = (document.getElementById('salaryMode').value === 'double');
+    document.getElementById('spouseSalaryBox').style.display = isDouble ? 'block' : 'none';
     calculate();
   }
 
@@ -933,15 +951,12 @@
     const startAge = parseInt(document.getElementById('startAge').value, 10);
     const retireAge = parseInt(document.getElementById('retireAge').value, 10);
 
-    // 25 歲階
     document.getElementById('box_stage_25').style.display = (startAge === 25) ? 'block' : 'none';
     document.getElementById('box_inv_25').style.display = (startAge === 25) ? 'block' : 'none';
 
-    // 30~34 歲階
     document.getElementById('box_stage_30').style.display = (startAge <= 30) ? 'block' : 'none';
     document.getElementById('box_inv_30').style.display = (startAge <= 30) ? 'block' : 'none';
 
-    // 延退階
     document.getElementById('box_stage_65').style.display = (retireAge > 65) ? 'block' : 'none';
     document.getElementById('box_inv_65').style.display = (retireAge > 65) ? 'block' : 'none';
 
@@ -1011,8 +1026,11 @@
   function calculate() {
     const startAge = parseInt(document.getElementById('startAge').value, 10);
     const retireAge = parseInt(document.getElementById('retireAge').value, 10);
-    const isDouble = document.getElementById('salaryMode').value === 'double';
-    const baseSalary = parseFloat(document.getElementById('baseSalary').value) || 0;
+    const isDoubleMode = (document.getElementById('salaryMode').value === 'double');
+
+    const baseSalarySelf = parseFloat(document.getElementById('baseSalarySelf').value) || 0;
+    const baseSalarySpouse = isDoubleMode ? (parseFloat(document.getElementById('baseSalarySpouse').value) || 0) : 0;
+    const marryAge = isDoubleMode ? parseInt(document.getElementById('marryAge').value, 10) : 999;
 
     // 居住模式決策 (買房 vs 租屋)
     const isBuyStrategy = (document.getElementById('housingStrategy').value === 'buy');
@@ -1026,15 +1044,13 @@
     const parentsHelp = isBuyStrategy ? (parseFloat(document.getElementById('parentsHelp').value) || 0) : 0;
     const graceYears = parseInt(document.getElementById('gracePeriod').value, 10);
 
-    // 買房相關規費與裝潢
-    const decorExpense = Math.round(housePrice * 0.06); // 裝潢家電約 6%
-    const taxAndAgentFee = Math.round(housePrice * 0.015); // 契稅印花代書約 1.5%
-    const rawDownPayment = Math.round(housePrice * (1 - loanRatio)); // 頭期款本金
+    const decorExpense = Math.round(housePrice * 0.06);
+    const taxAndAgentFee = Math.round(housePrice * 0.015);
+    const rawDownPayment = Math.round(housePrice * (1 - loanRatio));
     const totalOutlayOnBuy = rawDownPayment + decorExpense + taxAndAgentFee;
     const selfDownNeeded = Math.max(0, totalOutlayOnBuy - parentsHelp);
     const loanAmount = housePrice * loanRatio;
 
-    // 持有稅與管理費 (買房後才開始計算)
     const monthlyHoldingTax = isBuyStrategy ? Math.round(1200 * (housePrice / 10000000)) : 0;
     const baseBuyMaint = isBuyStrategy ? (parseFloat(document.getElementById('buyMaint').value) || 0) : 0;
 
@@ -1049,24 +1065,25 @@
     const initSavings = parseFloat(document.getElementById('initSavings').value) || 0;
     const initStock = parseFloat(document.getElementById('initStock').value) || 0;
 
-    // 退休金推算
+    // 退休金推算 (若有結婚則合併兩人年金)
     const isAutoPension = document.getElementById('autoPension').checked;
     let pensionMonthly = parseFloat(document.getElementById('pension').value) || 0;
     if (isAutoPension) {
       const maxInsured = 45800;
       const yearsWorked = Math.max(1, retireAge - startAge);
-      if (isDouble) {
-        const p1 = Math.min(baseSalary * 0.55, maxInsured);
-        const p2 = Math.min(baseSalary * 0.45, maxInsured);
-        pensionMonthly = Math.round((p1 * 0.0155 * yearsWorked + p1 * 0.42) + (p2 * 0.0155 * yearsWorked + p2 * 0.42));
-      } else {
-        const p = Math.min(baseSalary, maxInsured);
-        pensionMonthly = Math.round(p * 0.0155 * yearsWorked + p * 0.42);
+      const pSelf = Math.min(baseSalarySelf, maxInsured);
+      let totalPension = pSelf * 0.0155 * yearsWorked + pSelf * 0.42;
+
+      if (isDoubleMode && marryAge <= retireAge) {
+        const spouseYearsWorked = Math.max(1, retireAge - marryAge);
+        const pSpouse = Math.min(baseSalarySpouse, maxInsured);
+        totalPension += (pSpouse * 0.0155 * spouseYearsWorked + pSpouse * 0.42);
       }
+      pensionMonthly = Math.round(totalPension);
       document.getElementById('pension').value = pensionMonthly;
     }
 
-    function getStageBonus(age, currSalary) {
+    function getStageBonus(age, currSalarySelf) {
       if (age >= retireAge) return { mBonus: 0, yBonus: 0, fBonus: 0 };
       if (age < 30) {
         return {
@@ -1088,7 +1105,7 @@
         };
       } else if (age < 55) {
         const ratio = parseFloat(document.getElementById('yBonusMonth_45').value) || 1;
-        const yB = Math.round(currSalary * ratio);
+        const yB = Math.round(currSalarySelf * ratio);
         document.getElementById('lbl_yBonus_45').textContent = `年終 (${formatMoney(yB)}元)`;
         return {
           mBonus: parseFloat(document.getElementById('mBonus_45').value) || 0,
@@ -1097,7 +1114,7 @@
         };
       } else if (age < 65) {
         const ratio = parseFloat(document.getElementById('yBonusMonth_55').value) || 1;
-        const yB = Math.round(currSalary * ratio);
+        const yB = Math.round(currSalarySelf * ratio);
         document.getElementById('lbl_yBonus_55').textContent = `年終 (${formatMoney(yB)}元)`;
         return {
           mBonus: parseFloat(document.getElementById('mBonus_55').value) || 0,
@@ -1106,7 +1123,7 @@
         };
       } else {
         const ratio = parseFloat(document.getElementById('yBonusMonth_65').value) || 1;
-        const yB = Math.round(currSalary * ratio);
+        const yB = Math.round(currSalarySelf * ratio);
         return {
           mBonus: parseFloat(document.getElementById('mBonus_65').value) || 0,
           yBonus: yB,
@@ -1179,7 +1196,6 @@
     let currentStock = initStock;
     let downPaymentDeducted = false;
 
-    // 不投資組變數 (純存定存活存)
     let noInvestSavings = initSavings + initStock;
 
     const milestoneData = {};
@@ -1217,22 +1233,30 @@
         downPaymentDeducted = true;
       }
 
-      // 推算建議買房年齡
       if (isBuyStrategy && !canAffordHouse && recommendedBuyAge === null && yr > 0) {
         if ((currentSavings + selfDownNeeded) >= selfDownNeeded) {
           recommendedBuyAge = currentAge;
         }
       }
 
-      let monthlySalary = 0;
-      if (currentAge < retireAge) {
-        monthlySalary = Math.round(baseSalary * Math.pow(1.02, yr));
-      }
-      const bonusObj = getStageBonus(currentAge, monthlySalary);
-      const monthlyBonusShare = bonusObj.mBonus + ((bonusObj.yBonus + bonusObj.fBonus) / 12);
-      const monthlyEarnedIncome = monthlySalary + monthlyBonusShare;
+      // 薪資動態計算：個人本薪 + 另一半薪水 (到達結婚年齡後才併入)
+      let monthlySalarySelf = 0;
+      let monthlySalarySpouse = 0;
 
-      // 配息決策判斷
+      if (currentAge < retireAge) {
+        monthlySalarySelf = Math.round(baseSalarySelf * Math.pow(1.02, yr));
+        if (isDoubleMode && currentAge >= marryAge) {
+          const spouseYearsAfterMarry = currentAge - marryAge;
+          monthlySalarySpouse = Math.round(baseSalarySpouse * Math.pow(1.02, spouseYearsAfterMarry));
+        }
+      }
+
+      const totalMonthlyBaseSalary = monthlySalarySelf + monthlySalarySpouse;
+      const bonusObj = getStageBonus(currentAge, monthlySalarySelf);
+      const monthlyBonusShare = bonusObj.mBonus + ((bonusObj.yBonus + bonusObj.fBonus) / 12);
+      const monthlyEarnedIncome = totalMonthlyBaseSalary + monthlyBonusShare;
+
+      // 配息政策判斷
       let withdrawDiv = false;
       if (currentAge >= retireAge) {
         withdrawDiv = true;
@@ -1254,27 +1278,25 @@
       const monthlyDividend = (withdrawDiv && currentStock > 0) ? Math.round((currentStock * 0.045) / 12) : 0;
       const monthlyPension = (currentAge >= retireAge) ? pensionMonthly : 0;
 
-      // 居住與管理費精算：管理費「有買房且在買房後」才起算！
+      // 居住與管理費精算
       let monthlyHousing = 0;
       let monthlyMaint = 0;
 
       if (isBuyStrategy) {
         if (currentAge < buyAge) {
           monthlyHousing = Math.round(baseRent * Math.pow(1.02, yr));
-          monthlyMaint = 0; // 買房前無須繳納大樓管理費
+          monthlyMaint = 0;
         } else if (currentAge >= buyAge && currentAge < (buyAge + mortgageYears)) {
           const passedMortgageYears = currentAge - buyAge;
           const mortgagePmt = (passedMortgageYears < graceYears) ? graceMonthlyPayment : postGraceMonthlyPayment;
           const currentHoldingTax = Math.round(monthlyHoldingTax * Math.pow(1.02, yr));
           monthlyHousing = mortgagePmt + currentHoldingTax;
-          monthlyMaint = Math.round(baseBuyMaint * Math.pow(1.03, yr)); // 買房後起算大樓管理費 (年通膨3%)
+          monthlyMaint = Math.round(baseBuyMaint * Math.pow(1.03, yr));
         } else {
-          // 房貸繳清後僅剩持有稅
           monthlyHousing = Math.round(monthlyHoldingTax * Math.pow(1.02, yr));
           monthlyMaint = Math.round(baseBuyMaint * Math.pow(1.03, yr));
         }
       } else {
-        // 全程租屋：免管
         monthlyHousing = Math.round(baseRent * Math.pow(1.02, yr));
         monthlyMaint = 0;
       }
@@ -1295,7 +1317,10 @@
 
       if (ageList.includes(currentAge)) {
         milestoneData[currentAge] = {
-          salaryBonus: monthlyEarnedIncome,
+          salarySelf: monthlySalarySelf,
+          salarySpouse: monthlySalarySpouse,
+          bonus: monthlyBonusShare,
+          salaryTotal: monthlyEarnedIncome,
           dividend: monthlyDividend,
           pension: monthlyPension,
           totalIncome: totalMonthlyIncome,
@@ -1315,18 +1340,15 @@
         compareMilestone.noInvestSurplus[currentAge] = noInvestSurplus;
       }
 
-      // 股票滾存 (年化 9% / 6%)
       const annualStockGrowthRate = withdrawDiv ? 0.06 : 0.09;
       currentStock = Math.round(currentStock * (1 + annualStockGrowthRate) + (curInv * 12));
 
-      // 活存滾存 (年息 1%)
       if (monthlySurplus >= 0) {
         currentSavings = Math.round(currentSavings * 1.01 + (monthlySurplus * 12));
       } else {
         currentSavings += (monthlySurplus * 12);
       }
 
-      // 不投資組存款滾存
       if (noInvestSurplus >= 0) {
         noInvestSavings = Math.round(noInvestSavings * 1.01 + (noInvestSurplus * 12));
       } else {
@@ -1348,7 +1370,7 @@
       annualNoInvestNet.push(noInvestSavings);
     }
 
-    // 更新買房自備款與警告提示
+    // 更新買房提示
     const tipEl = document.getElementById('downPaymentTip');
     if (!isBuyStrategy) {
       tipEl.className = 'tip-box';
@@ -1427,7 +1449,9 @@
     const tbody = document.getElementById('resultTableBody');
     tbody.innerHTML = `
       <tr style="background:#f1f5f9; font-weight:700;"><td>月總收入 (合計)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].totalIncome)}</td>`).join('')}</tr>
-      <tr class="sub-row"><td> ├ 每月本薪與獎金</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salaryBonus)}</td>`).join('')}</tr>
+      <tr class="sub-row"><td> ├ 本人每月薪資</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySelf)}</td>`).join('')}</tr>
+      ${isDoubleMode ? `<tr class="sub-row" style="color:var(--purple)"><td> ├ 另一半月薪 (${marryAge}歲結婚起算)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySpouse)}</td>`).join('')}</tr>` : ''}
+      <tr class="sub-row"><td> ├ 每月獎金攤提</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].bonus)}</td>`).join('')}</tr>
       <tr class="sub-row"><td> ├ 每月股票配息收入</td>${ageList.map(a => `<td style="color:${milestoneData[a].dividend > 0 ? 'var(--primary-dark)' : 'inherit'}; font-weight:${milestoneData[a].dividend > 0 ? '700' : 'normal'}">${formatMoney(milestoneData[a].dividend)}</td>`).join('')}</tr>
       <tr class="sub-row"><td> └ 每月退休勞保勞退年金</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].pension)}</td>`).join('')}</tr>
       <tr><td>每月居住成本 (${isBuyStrategy ? '房貸/稅/租' : '房租'})</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].housing)}</td>`).join('')}</tr>
@@ -1471,7 +1495,6 @@
       </tr>
     `;
 
-    // 比較摘要提示
     const compareTip = document.getElementById('compareSummaryTip');
     const finalDiffWan = ((compareMilestone.investNet[endAge] - compareMilestone.noInvestNet[endAge]) / 10000).toFixed(0);
     compareTip.innerHTML = `
@@ -1555,6 +1578,7 @@
 
   window.onload = () => {
     updateStageVisibility();
+    handleSalaryModeChange();
     handleHousingStrategyChange();
     handleChildToggle();
   };
