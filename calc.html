@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人生生存試算器 60年長期財務模型 (雙薪與結婚節點版)</title>
+  <title>人生生存試算器 60年長期財務模型 (性別與育嬰留停版)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -302,7 +302,7 @@
 <div class="container">
   <header>
     <h1>人生生存試算器 (60年長期財務模型)</h1>
-    <p>自選起算與退休年齡、獨立另一半薪資與結婚年齡節點、購屋置產與投資對照</p>
+    <p>自選起算與退休年齡、另一半結婚獎金推估、產假育嬰留停薪資折減、投資雙軌對照</p>
   </header>
 
   <div class="grid">
@@ -332,12 +332,21 @@
       </div>
 
       <div class="section-subtitle">💵 收入與薪資模式</div>
-      <div class="form-group">
-        <label>薪水模式</label>
-        <select id="salaryMode" onchange="handleSalaryModeChange()">
-          <option value="single">單薪模式</option>
-          <option value="double" selected>雙薪模式 (可分開填寫與選結婚年齡)</option>
-        </select>
+      <div class="input-row">
+        <div class="form-group">
+          <label>薪水模式</label>
+          <select id="salaryMode" onchange="handleSalaryModeChange()">
+            <option value="single">單薪模式</option>
+            <option value="double" selected>雙薪模式</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>主要填表方性別 (影響產假判定)</label>
+          <select id="userGender" onchange="calculate()">
+            <option value="male" selected>我是男生 (另一半為女生)</option>
+            <option value="female">我是女生 (自己產假/育嬰)</option>
+          </select>
+        </div>
       </div>
 
       <div class="form-group">
@@ -345,7 +354,7 @@
         <input type="number" id="baseSalarySelf" value="38000" step="1000" oninput="calculate()">
       </div>
 
-      <!-- 雙薪專用區塊 -->
+      <!-- 另一半專區 (含結婚年齡與另一半獎金推估) -->
       <div id="spouseSalaryBox" class="spouse-box">
         <div class="input-row">
           <div class="form-group">
@@ -355,16 +364,32 @@
           <div class="form-group">
             <label>預計幾歲結婚合併雙薪？</label>
             <select id="marryAge" onchange="calculate()">
-              <option value="30">30 歲結婚 (起算即雙薪)</option>
+              <option value="30">30 歲結婚</option>
               <option value="32">32 歲結婚</option>
-              <option value="35" selected>35 歲結婚</option>
-              <option value="38">38 歲結婚</option>
+              <option value="35">35 歲結婚</option>
+              <option value="38" selected>38 歲結婚</option>
               <option value="40">40 歲結婚</option>
             </select>
           </div>
         </div>
-        <div style="font-size:0.78rem; color:#86198f; margin-top:4px;">
-          * 結婚前僅計入自己的單薪；結婚當年起，另一半薪水（含每年 2% 調薪）正式併入家庭收入。
+
+        <div class="stage-label" style="margin-top: 6px; color:#a21caf;">🎁 另一半結婚當下各項獎金 (結婚後年漲2%複利)</div>
+        <div class="input-row-3">
+          <div class="form-group">
+            <label>每月常態獎金</label>
+            <input type="number" id="mBonus_Spouse" value="0" step="1000" oninput="calculate()">
+          </div>
+          <div class="form-group">
+            <label>年終獎金(手動)</label>
+            <input type="number" id="yBonus_Spouse" value="45000" step="1000" oninput="calculate()">
+          </div>
+          <div class="form-group">
+            <label>三節獎金(年)</label>
+            <input type="number" id="fBonus_Spouse" value="3000" step="1000" oninput="calculate()">
+          </div>
+        </div>
+        <div style="font-size:0.75rem; color:#86198f; margin-top:2px;">
+          * 結婚前另一半薪獎為 0；結婚當年起併入，本薪與所有獎金隨後每年享 2% 複利調薪。
         </div>
       </div>
 
@@ -626,20 +651,30 @@
       <!-- 五階段育兒支出模型 -->
       <div class="section-subtitle">👶 小孩生養與五大教育階段支出</div>
       <div class="child-box">
-        <div class="form-group">
-          <label>規劃幾歲生小孩？</label>
-          <select id="childBornAge" onchange="handleChildToggle()">
-            <option value="0" selected>無生育規劃 (0元)</option>
-            <option value="26">26 歲生小孩</option>
-            <option value="28">28 歲生小孩</option>
-            <option value="30">30 歲生小孩</option>
-            <option value="32">32 歲生小孩</option>
-            <option value="35">35 歲生小孩</option>
-            <option value="38">38 歲生小孩</option>
-          </select>
+        <div class="input-row">
+          <div class="form-group">
+            <label>規劃幾歲生小孩？</label>
+            <select id="childBornAge" onchange="handleChildToggle()">
+              <option value="0">無生育規劃 (0元)</option>
+              <option value="26">26 歲生小孩</option>
+              <option value="28">28 歲生小孩</option>
+              <option value="30">30 歲生小孩</option>
+              <option value="32">32 歲生小孩</option>
+              <option value="35">35 歲生小孩</option>
+              <option value="38" selected>38 歲生小孩</option>
+            </select>
+          </div>
+          <div class="form-group" id="maternityLeaveRow">
+            <label>0～2歲女性產假/育嬰留停薪資</label>
+            <select id="maternityPayType" onchange="calculate()">
+              <option value="1">正常上班 (100%全薪)</option>
+              <option value="0.5" selected>產假/育嬰津貼 (半薪 50%)</option>
+              <option value="0">全職育嬰留停 (無薪 0%)</option>
+            </select>
+          </div>
         </div>
 
-        <div id="childStagesContainer" style="display:none;">
+        <div id="childStagesContainer">
           <div class="stage-box">
             <div class="stage-label">🍼 階段一：0～3 歲嬰幼兒期 (每月支出)</div>
             <div class="input-row-4">
@@ -981,7 +1016,9 @@
   function handleChildToggle() {
     const childAge = parseInt(document.getElementById('childBornAge').value, 10);
     const details = document.getElementById('childStagesContainer');
+    const matRow = document.getElementById('maternityLeaveRow');
     details.style.display = (childAge === 0) ? 'none' : 'block';
+    matRow.style.display = (childAge === 0) ? 'none' : 'block';
     calculate();
   }
 
@@ -1027,12 +1064,18 @@
     const startAge = parseInt(document.getElementById('startAge').value, 10);
     const retireAge = parseInt(document.getElementById('retireAge').value, 10);
     const isDoubleMode = (document.getElementById('salaryMode').value === 'double');
+    const userGender = document.getElementById('userGender').value;
 
     const baseSalarySelf = parseFloat(document.getElementById('baseSalarySelf').value) || 0;
     const baseSalarySpouse = isDoubleMode ? (parseFloat(document.getElementById('baseSalarySpouse').value) || 0) : 0;
     const marryAge = isDoubleMode ? parseInt(document.getElementById('marryAge').value, 10) : 999;
 
-    // 居住模式決策 (買房 vs 租屋)
+    // 另一半結婚當下獎金基底
+    const mBonusSpouseBase = isDoubleMode ? (parseFloat(document.getElementById('mBonus_Spouse').value) || 0) : 0;
+    const yBonusSpouseBase = isDoubleMode ? (parseFloat(document.getElementById('yBonus_Spouse').value) || 0) : 0;
+    const fBonusSpouseBase = isDoubleMode ? (parseFloat(document.getElementById('fBonus_Spouse').value) || 0) : 0;
+
+    // 居住模式決策
     const isBuyStrategy = (document.getElementById('housingStrategy').value === 'buy');
     const buyAge = isBuyStrategy ? parseInt(document.getElementById('buyAge').value, 10) : 0;
 
@@ -1065,7 +1108,7 @@
     const initSavings = parseFloat(document.getElementById('initSavings').value) || 0;
     const initStock = parseFloat(document.getElementById('initStock').value) || 0;
 
-    // 退休金推算 (若有結婚則合併兩人年金)
+    // 退休金推算
     const isAutoPension = document.getElementById('autoPension').checked;
     let pensionMonthly = parseFloat(document.getElementById('pension').value) || 0;
     if (isAutoPension) {
@@ -1181,6 +1224,7 @@
 
     const baseGeneralLiving = expFood + expFun + expHealth + expPhone + expWater + expPower + expNet + expInsurance;
     const childBornAge = parseInt(document.getElementById('childBornAge').value, 10);
+    const maternityPayRatio = parseFloat(document.getElementById('maternityPayType').value) || 1;
 
     const endAge = 85;
     const totalYears = endAge - startAge;
@@ -1239,24 +1283,53 @@
         }
       }
 
-      // 薪資動態計算：個人本薪 + 另一半薪水 (到達結婚年齡後才併入)
+      // 判定 0～2 歲產假/育嬰留停期間
+      const isMaternityPhase = (childBornAge > 0 && currentAge >= childBornAge && currentAge <= (childBornAge + 2));
+
+      // 薪資計算 (本薪與產假折減)
       let monthlySalarySelf = 0;
       let monthlySalarySpouse = 0;
 
       if (currentAge < retireAge) {
-        monthlySalarySelf = Math.round(baseSalarySelf * Math.pow(1.02, yr));
+        let fullSalarySelf = Math.round(baseSalarySelf * Math.pow(1.02, yr));
+        // 若自己是女性且在育嬰期，折減薪資
+        if (userGender === 'female' && isMaternityPhase) {
+          monthlySalarySelf = Math.round(fullSalarySelf * maternityPayRatio);
+        } else {
+          monthlySalarySelf = fullSalarySelf;
+        }
+
+        // 另一半薪水計算 (結婚後起算)
         if (isDoubleMode && currentAge >= marryAge) {
           const spouseYearsAfterMarry = currentAge - marryAge;
-          monthlySalarySpouse = Math.round(baseSalarySpouse * Math.pow(1.02, spouseYearsAfterMarry));
+          let fullSalarySpouse = Math.round(baseSalarySpouse * Math.pow(1.02, spouseYearsAfterMarry));
+          // 若自己是男性 (另一半為女性) 且在育嬰期，折減另一半薪資
+          if (userGender === 'male' && isMaternityPhase) {
+            monthlySalarySpouse = Math.round(fullSalarySpouse * maternityPayRatio);
+          } else {
+            monthlySalarySpouse = fullSalarySpouse;
+          }
         }
       }
 
-      const totalMonthlyBaseSalary = monthlySalarySelf + monthlySalarySpouse;
-      const bonusObj = getStageBonus(currentAge, monthlySalarySelf);
-      const monthlyBonusShare = bonusObj.mBonus + ((bonusObj.yBonus + bonusObj.fBonus) / 12);
-      const monthlyEarnedIncome = totalMonthlyBaseSalary + monthlyBonusShare;
+      // 另一半獎金 (結婚當年起算，依2%複利推估)
+      let monthlySpouseBonusShare = 0;
+      if (isDoubleMode && currentAge >= marryAge && currentAge < retireAge) {
+        const spouseYearsAfterMarry = currentAge - marryAge;
+        const spouseInflation = Math.pow(1.02, spouseYearsAfterMarry);
+        const mB = mBonusSpouseBase * spouseInflation;
+        const yB = yBonusSpouseBase * spouseInflation;
+        const fB = fBonusSpouseBase * spouseInflation;
+        monthlySpouseBonusShare = Math.round(mB + (yB + fB) / 12);
+      }
 
-      // 配息政策判斷
+      // 個人獎金
+      const bonusObj = getStageBonus(currentAge, monthlySalarySelf);
+      const monthlyBonusShareSelf = bonusObj.mBonus + ((bonusObj.yBonus + bonusObj.fBonus) / 12);
+
+      const totalMonthlyEarned = monthlySalarySelf + monthlySalarySpouse + monthlyBonusShareSelf + monthlySpouseBonusShare;
+
+      // 配息決策判斷
       let withdrawDiv = false;
       if (currentAge >= retireAge) {
         withdrawDiv = true;
@@ -1306,12 +1379,12 @@
       const monthlyLiving = Math.round(baseGeneralLiving * Math.pow(1.03, yr)) + monthlyChild + monthlyMaint;
 
       // 投資組現金流
-      const totalMonthlyIncome = monthlyEarnedIncome + monthlyDividend + monthlyPension;
+      const totalMonthlyIncome = totalMonthlyEarned + monthlyDividend + monthlyPension;
       const totalMonthlyExpense = monthlyHousing + monthlyLiving + curInv;
       const monthlySurplus = totalMonthlyIncome - totalMonthlyExpense;
 
       // 不投資組現金流
-      const noInvestIncome = monthlyEarnedIncome + monthlyPension;
+      const noInvestIncome = totalMonthlyEarned + monthlyPension;
       const noInvestExpense = monthlyHousing + monthlyLiving;
       const noInvestSurplus = noInvestIncome - noInvestExpense;
 
@@ -1319,8 +1392,9 @@
         milestoneData[currentAge] = {
           salarySelf: monthlySalarySelf,
           salarySpouse: monthlySalarySpouse,
-          bonus: monthlyBonusShare,
-          salaryTotal: monthlyEarnedIncome,
+          bonusSelf: monthlyBonusShareSelf,
+          bonusSpouse: monthlySpouseBonusShare,
+          salaryTotal: totalMonthlyEarned,
           dividend: monthlyDividend,
           pension: monthlyPension,
           totalIncome: totalMonthlyIncome,
@@ -1449,9 +1523,8 @@
     const tbody = document.getElementById('resultTableBody');
     tbody.innerHTML = `
       <tr style="background:#f1f5f9; font-weight:700;"><td>月總收入 (合計)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].totalIncome)}</td>`).join('')}</tr>
-      <tr class="sub-row"><td> ├ 本人每月薪資</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySelf)}</td>`).join('')}</tr>
-      ${isDoubleMode ? `<tr class="sub-row" style="color:var(--purple)"><td> ├ 另一半月薪 (${marryAge}歲結婚起算)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySpouse)}</td>`).join('')}</tr>` : ''}
-      <tr class="sub-row"><td> ├ 每月獎金攤提</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].bonus)}</td>`).join('')}</tr>
+      <tr class="sub-row"><td> ├ 本人薪資 (含獎金)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySelf + milestoneData[a].bonusSelf)}</td>`).join('')}</tr>
+      ${isDoubleMode ? `<tr class="sub-row" style="color:var(--purple)"><td> ├ 另一半薪獎 (${marryAge}歲結婚起算)</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].salarySpouse + milestoneData[a].bonusSpouse)}</td>`).join('')}</tr>` : ''}
       <tr class="sub-row"><td> ├ 每月股票配息收入</td>${ageList.map(a => `<td style="color:${milestoneData[a].dividend > 0 ? 'var(--primary-dark)' : 'inherit'}; font-weight:${milestoneData[a].dividend > 0 ? '700' : 'normal'}">${formatMoney(milestoneData[a].dividend)}</td>`).join('')}</tr>
       <tr class="sub-row"><td> └ 每月退休勞保勞退年金</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].pension)}</td>`).join('')}</tr>
       <tr><td>每月居住成本 (${isBuyStrategy ? '房貸/稅/租' : '房租'})</td>${ageList.map(a => `<td>${formatMoney(milestoneData[a].housing)}</td>`).join('')}</tr>
