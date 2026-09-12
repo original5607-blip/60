@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人生生存試算器 60年長期財務模型 (含雜支開銷版)</title>
+  <title>人生生存試算器 60年長期財務模型 (新青安分段利率版)</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
@@ -302,7 +302,7 @@
 <div class="container">
   <header>
     <h1>人生生存試算器 (60年長期財務模型)</h1>
-    <p>自選起算與退休年齡、另一半結婚獎金推估、產假育嬰留停薪資折減、日常雜支精算</p>
+    <p>自選起算與退休年齡、新青安分段利率與5年/3年寬限期動態切換、投資雙軌對照</p>
   </header>
 
   <div class="grid">
@@ -389,9 +389,6 @@
             <label>三節獎金(年)</label>
             <input type="number" id="fBonus_Spouse" value="3000" step="1000" oninput="calculate()">
           </div>
-        </div>
-        <div style="font-size:0.75rem; color:#86198f; margin-top:2px;">
-          * 結婚前另一半薪獎為 0；結婚當年起併入，本薪與所有獎金隨後每年享 2% 複利調薪。
         </div>
       </div>
 
@@ -502,7 +499,7 @@
         </div>
       </div>
 
-      <!-- 65~74 歲獎金 (延退專用) -->
+      <!-- 65~74 歲獎金 -->
       <div class="stage-box" id="box_stage_65" style="display:none;">
         <div class="stage-label">📍 第 4 階段：65～74 歲獎金 (延退工作期)</div>
         <div class="input-row-3">
@@ -525,7 +522,7 @@
         </div>
       </div>
 
-      <!-- 居住規劃專區 -->
+      <!-- 居住規劃專區 (新青安分段利率與寬限期升級) -->
       <div class="section-subtitle">🏠 居住模式與購屋規劃</div>
       <div class="housing-box">
         <div class="form-group">
@@ -561,7 +558,7 @@
             </div>
           </div>
 
-          <div class="input-row-3">
+          <div class="input-row">
             <div class="form-group">
               <label>房屋總價 (萬元)</label>
               <input type="number" id="housePriceWan" value="1650" step="50" oninput="calculate()">
@@ -570,31 +567,55 @@
               <label>貸款成數 (%)</label>
               <input type="number" id="loanRatio" value="75" step="5" oninput="calculate()">
             </div>
+          </div>
+
+          <!-- 房貸方案與分段利率/寬限期設定 -->
+          <div class="stage-box" style="background:#ffffff; border:1px solid #bfdbfe; margin-top:6px;">
+            <div class="stage-label" style="color:var(--secondary);">🏦 房貸方案、分段利率與寬限期設定</div>
+            
             <div class="form-group">
-              <label>房貸年利率 (%)</label>
-              <input type="number" id="mortgageRate" value="2.5" step="0.05" oninput="calculate()">
+              <label>適用房貸方案</label>
+              <select id="mortgagePlanType" onchange="handleMortgagePlanChange()">
+                <option value="qing_an" selected>符合新青安方案 (享前5年優惠利率，最高5年寬限期)</option>
+                <option value="regular">一般首購 / 商業房貸 (單一自談利率，最高3年寬限期)</option>
+              </select>
+            </div>
+
+            <!-- 新青安利率輸入框 -->
+            <div id="rowQingAnRate" class="input-row">
+              <div class="form-group">
+                <label>前5年新青安優惠利率 (%)</label>
+                <input type="number" id="mortgageRateQingAn" value="1.775" step="0.025" oninput="calculate()">
+              </div>
+              <div class="form-group">
+                <label>第6年起自談利率 (%)</label>
+                <input type="number" id="mortgageRatePostQingAn" value="2.15" step="0.05" oninput="calculate()">
+              </div>
+            </div>
+
+            <!-- 一般貸款利率輸入框 -->
+            <div id="rowRegularRate" class="form-group" style="display:none;">
+              <label>自談房貸年利率 (%)</label>
+              <input type="number" id="mortgageRateRegular" value="2.2" step="0.05" oninput="calculate()">
+            </div>
+
+            <div class="form-group">
+              <label id="lbl_gracePeriod">寬限期選擇</label>
+              <select id="gracePeriod" onchange="calculate()">
+                <!-- 動態注入選項 -->
+              </select>
             </div>
           </div>
 
-          <div class="input-row">
+          <div class="input-row" style="margin-top:6px;">
             <div class="form-group">
               <label>父母贊助款 (買房專屬 NT$)</label>
               <input type="number" id="parentsHelp" value="1000000" step="50000" oninput="calculate()">
             </div>
             <div class="form-group">
-              <label>新青安 / 寬限期選擇</label>
-              <select id="gracePeriod" onchange="calculate()">
-                <option value="0">無寬限期 (本息均攤)</option>
-                <option value="1">1 年寬限期 (只繳息)</option>
-                <option value="3">3 年寬限期 (只繳息)</option>
-                <option value="5" selected>5 年寬限期 (新青安上限)</option>
-              </select>
+              <label>購屋後每月大樓管理費 (NT$)</label>
+              <input type="number" id="buyMaint" value="2500" step="200" oninput="calculate()">
             </div>
-          </div>
-
-          <div class="form-group" style="margin-top: 6px;">
-            <label>購屋後每月大樓管理費 (買房後才開始計收 NT$)</label>
-            <input type="number" id="buyMaint" value="2500" step="200" oninput="calculate()">
           </div>
         </div>
 
@@ -608,7 +629,7 @@
         <input type="number" id="baseRent" value="5000" step="500" oninput="calculate()">
       </div>
 
-      <!-- 細項日常生活開銷 (含雜支開銷) -->
+      <!-- 細項日常生活開銷 -->
       <div class="section-subtitle">🛒 每月細項基礎生活開銷 (年通膨3%)</div>
       <div class="input-row">
         <div class="form-group">
@@ -996,15 +1017,12 @@
     const startAge = parseInt(document.getElementById('startAge').value, 10);
     const retireAge = parseInt(document.getElementById('retireAge').value, 10);
 
-    // 25 歲階
     document.getElementById('box_stage_25').style.display = (startAge === 25) ? 'block' : 'none';
     document.getElementById('box_inv_25').style.display = (startAge === 25) ? 'block' : 'none';
 
-    // 30~34 歲階
     document.getElementById('box_stage_30').style.display = (startAge <= 30) ? 'block' : 'none';
     document.getElementById('box_inv_30').style.display = (startAge <= 30) ? 'block' : 'none';
 
-    // 延退階
     document.getElementById('box_stage_65').style.display = (retireAge > 65) ? 'block' : 'none';
     document.getElementById('box_inv_65').style.display = (retireAge > 65) ? 'block' : 'none';
 
@@ -1022,6 +1040,33 @@
     } else {
       buyDetails.style.display = 'block';
       lblRent.textContent = '未買房前每月租金 (買房後自動歸零 NT$)';
+    }
+    calculate();
+  }
+
+  function handleMortgagePlanChange() {
+    const planType = document.getElementById('mortgagePlanType').value;
+    const rowQingAn = document.getElementById('rowQingAnRate');
+    const rowRegular = document.getElementById('rowRegularRate');
+    const graceSelect = document.getElementById('gracePeriod');
+
+    if (planType === 'qing_an') {
+      rowQingAn.style.display = 'grid';
+      rowRegular.style.display = 'none';
+      graceSelect.innerHTML = `
+        <option value="0">無寬限期 (本息均攤)</option>
+        <option value="1">1 年寬限期 (只繳息)</option>
+        <option value="3">3 年寬限期 (只繳息)</option>
+        <option value="5" selected>5 年寬限期 (新青安上限)</option>
+      `;
+    } else {
+      rowQingAn.style.display = 'none';
+      rowRegular.style.display = 'block';
+      graceSelect.innerHTML = `
+        <option value="0">無寬限期 (本息均攤)</option>
+        <option value="1">1 年寬限期 (只繳息)</option>
+        <option value="3" selected>3 年寬限期 (一般銀行上限)</option>
+      `;
     }
     calculate();
   }
@@ -1093,10 +1138,16 @@
     const housePriceWan = parseFloat(document.getElementById('housePriceWan').value) || 0;
     const housePrice = housePriceWan * 10000;
     const loanRatio = (parseFloat(document.getElementById('loanRatio').value) || 80) / 100;
-    const mortgageRate = parseFloat(document.getElementById('mortgageRate').value) || 2.2;
     const mortgageYears = parseInt(document.getElementById('mortgageTotalYears').value, 10);
     const parentsHelp = isBuyStrategy ? (parseFloat(document.getElementById('parentsHelp').value) || 0) : 0;
     const graceYears = parseInt(document.getElementById('gracePeriod').value, 10);
+
+    // 判斷房貸方案與利率
+    const planType = document.getElementById('mortgagePlanType').value;
+    const isQingAn = (planType === 'qing_an');
+    const rateQingAn = parseFloat(document.getElementById('mortgageRateQingAn').value) || 1.775;
+    const ratePostQingAn = parseFloat(document.getElementById('mortgageRatePostQingAn').value) || 2.15;
+    const rateRegular = parseFloat(document.getElementById('mortgageRateRegular').value) || 2.2;
 
     const decorExpense = Math.round(housePrice * 0.06);
     const taxAndAgentFee = Math.round(housePrice * 0.015);
@@ -1108,12 +1159,21 @@
     const monthlyHoldingTax = isBuyStrategy ? Math.round(1200 * (housePrice / 10000000)) : 0;
     const baseBuyMaint = isBuyStrategy ? (parseFloat(document.getElementById('buyMaint').value) || 0) : 0;
 
-    let graceMonthlyPayment = 0;
-    let postGraceMonthlyPayment = 0;
-    if (isBuyStrategy && loanAmount > 0) {
-      graceMonthlyPayment = Math.round(loanAmount * (mortgageRate / 100) / 12);
-      const remainAmortYears = Math.max(1, mortgageYears - graceYears);
-      postGraceMonthlyPayment = computePMT(mortgageRate, remainAmortYears, loanAmount);
+    // 計算特定年數的房貸月付金函式
+    function getMortgagePayment(passedYears) {
+      if (!isBuyStrategy || loanAmount <= 0) return 0;
+      if (passedYears >= mortgageYears) return 0;
+
+      // 在寬限期內：純繳息
+      if (passedYears < graceYears) {
+        const activeRate = isQingAn ? (passedYears < 5 ? rateQingAn : ratePostQingAn) : rateRegular;
+        return Math.round(loanAmount * (activeRate / 100) / 12);
+      }
+
+      // 超過寬限期：本息均攤 (按剩餘年限本息平均攤還)
+      const amortYears = Math.max(1, mortgageYears - graceYears);
+      const activeRate = isQingAn ? (passedYears < 5 ? rateQingAn : ratePostQingAn) : rateRegular;
+      return computePMT(activeRate, amortYears, loanAmount);
     }
 
     const initSavings = parseFloat(document.getElementById('initSavings').value) || 0;
@@ -1231,7 +1291,7 @@
     const expPower = parseFloat(document.getElementById('expPower').value) || 0;
     const expNet = parseFloat(document.getElementById('expNet').value) || 0;
     const expInsurance = parseFloat(document.getElementById('expInsurance').value) || 0;
-    const expMisc = parseFloat(document.getElementById('expMisc').value) || 0; // 新增雜支項
+    const expMisc = parseFloat(document.getElementById('expMisc').value) || 0;
 
     const baseGeneralLiving = expFood + expFun + expHealth + expPhone + expWater + expPower + expNet + expInsurance + expMisc;
     const childBornAge = parseInt(document.getElementById('childBornAge').value, 10);
@@ -1276,7 +1336,6 @@
     for (let yr = 0; yr <= totalYears; yr++) {
       const currentAge = startAge + yr;
 
-      // 買房當歲扣除自備款
       if (isBuyStrategy && currentAge === buyAge && !downPaymentDeducted) {
         savingsBeforeBuy = currentSavings;
         if (currentSavings < selfDownNeeded) {
@@ -1361,7 +1420,7 @@
           monthlyMaint = 0;
         } else if (currentAge >= buyAge && currentAge < (buyAge + mortgageYears)) {
           const passedMortgageYears = currentAge - buyAge;
-          const mortgagePmt = (passedMortgageYears < graceYears) ? graceMonthlyPayment : postGraceMonthlyPayment;
+          const mortgagePmt = getMortgagePayment(passedMortgageYears);
           const currentHoldingTax = Math.round(monthlyHoldingTax * Math.pow(1.02, yr));
           monthlyHousing = mortgagePmt + currentHoldingTax;
           monthlyMaint = Math.round(baseBuyMaint * Math.pow(1.03, yr));
@@ -1447,6 +1506,8 @@
       tipEl.className = 'tip-box';
       tipEl.innerHTML = `<strong>居住策略：全程租屋</strong><br>無須籌措頭期款與負擔裝潢規費及大樓管理費，父母贊助款不計入個人資產。退休後將持續面對年漲 2% 之租金支出。`;
     } else {
+      const initialGracePayment = getMortgagePayment(0);
+      const postGraceFirstPayment = getMortgagePayment(graceYears);
       if (canAffordHouse) {
         tipEl.className = 'tip-box';
         tipEl.innerHTML = `
@@ -1455,7 +1516,7 @@
           * 自動計入裝潢家電 (6%)：NT$ ${formatMoney(decorExpense)} 元，代書與契稅規費 (1.5%)：NT$ ${formatMoney(taxAndAgentFee)} 元<br>
           * <strong>購屋總需現金：NT$ ${formatMoney(totalOutlayOnBuy)} 元</strong> (扣除父母贊助 NT$ ${formatMoney(parentsHelp)} 元後，<strong>自己需備：NT$ ${formatMoney(selfDownNeeded)} 元</strong>)<br>
           * <strong>資金充裕</strong>：${buyAge} 歲買房時預估活存有 NT$ ${formatMoney(savingsBeforeBuy)} 元，扣除自備款後仍保有安全週轉金。<br>
-          * 房貸試算：${graceYears > 0 ? `前 ${graceYears} 年寬限期約 NT$ ${formatMoney(graceMonthlyPayment)}/月，第 ${graceYears + 1} 年起本息攤還約 NT$ ${formatMoney(postGraceMonthlyPayment)}/月` : `本息均攤約 NT$ ${formatMoney(postGraceMonthlyPayment)}/月`} (另含每月持有稅約 NT$ ${formatMoney(monthlyHoldingTax)} 元、大樓管理費 NT$ ${formatMoney(baseBuyMaint)} 元於買房後起算)。
+          * 房貸試算 (${isQingAn ? '新青安專案' : '一般房貸'})：${graceYears > 0 ? `前 ${graceYears} 年寬限期約 NT$ ${formatMoney(initialGracePayment)}/月 (純繳息)，第 ${graceYears + 1} 年起本息攤還約 NT$ ${formatMoney(postGraceFirstPayment)}/月` : `本息均攤約 NT$ ${formatMoney(postGraceFirstPayment)}/月`} (另含每月持有稅約 NT$ ${formatMoney(monthlyHoldingTax)} 元、大樓管理費 NT$ ${formatMoney(baseBuyMaint)} 元於買房後起算)。
         `;
       } else {
         tipEl.className = 'tip-box warning';
@@ -1648,6 +1709,7 @@
     updateStageVisibility();
     handleSalaryModeChange();
     handleHousingStrategyChange();
+    handleMortgagePlanChange();
     handleChildToggle();
   };
 </script>
